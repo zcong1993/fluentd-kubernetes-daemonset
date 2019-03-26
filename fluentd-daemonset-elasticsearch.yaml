@@ -2,7 +2,6 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: fluentd
-  namespace: kube-system
   labels:
     k8s-app: fluentd-logging
     version: v1
@@ -20,30 +19,17 @@ spec:
         effect: NoSchedule
       containers:
       - name: fluentd
-        image: fluent/fluentd-kubernetes-daemonset:elasticsearch
+        image: fluentd-es
+        imagePullPolicy: Never
         env:
           - name:  FLUENT_ELASTICSEARCH_HOST
-            value: "elasticsearch-logging"
+            value: "elasticsearch"
           - name:  FLUENT_ELASTICSEARCH_PORT
             value: "9200"
           - name: FLUENT_ELASTICSEARCH_SCHEME
             value: "http"
-          # Option to configure elasticsearch plugin with self signed certs
-          # ================================================================
-          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
-            value: "true"
-          # X-Pack Authentication
-          # =====================
-          - name: FLUENT_ELASTICSEARCH_USER
-            value: "elastic"
-          - name: FLUENT_ELASTICSEARCH_PASSWORD
-            value: "changeme"
-          # Logz.io Authentication
-          # ======================
-          - name: LOGZIO_TOKEN
-            value: "ThisIsASuperLongToken"
-          - name: LOGZIO_LOGTYPE
-            value: "kubernetes"
+          - name: FLUENT_UID
+            value: "0"
         resources:
           limits:
             memory: 200Mi
